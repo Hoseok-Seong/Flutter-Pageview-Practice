@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'ad.dart';
-import 'diary.dart';
 
 void main() {
   runApp(const MyApp());
@@ -22,120 +20,92 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double appBarHeight = screenHeight * 0.1; // AppBar 높이 계산
+    return _thirdBuild(appBarHeight);
+  }
+
+  Widget _thirdBuild(double appBarHeight) {
+    return Stack(
+      children: [
+        PageView.builder(
+          itemCount: 5,
+          itemBuilder: (context, index) {
+            return Image.network(
+              "https://picsum.photos/id/${index + 1}/200/300",
+              fit: BoxFit.cover,
+            );
+          },
+        ),
+        Positioned( // IgnorePointer
+          left: 0,
+          top: 0,
+          right: 0,
+          height: appBarHeight,
+          child: AppBar(
+            backgroundColor: Colors.transparent,
+            title: Text("Around"),
+            leading: IconButton(
+              onPressed: () {
+                print("클릭됨");
+              },
+              icon: Icon(Icons.menu),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _secondBuild() {
+    return PageView.builder(
+      itemCount: 5,
+      itemBuilder: (context, index) {
+        return Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image:
+              NetworkImage("https://picsum.photos/id/${index + 1}/200/300"),
+              fit: BoxFit.cover,
+            ),
+          ),
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            appBar: AppBar(
+              backgroundColor: Colors.transparent,
+              title: Text("Around"),
+              leading: Icon(Icons.menu),
+            ),
+            body: Center(
+              child: Text("Page ${index + 1}"),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // Sliver의 expandedHeight 사용하기
+  Widget _firstBuild(double screenHeight) {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            snap: true,
-            floating: true,
-            title: Text("SliverAppbar"),
-            pinned: false,
-            expandedHeight: 250,
-            flexibleSpace: Container(
-              child: Center(
-                child: Text(
-                  "FlexibleSpace",
-                  style: TextStyle(fontSize: 50),
-                ),
-              ),
-            ),
-          ),
-          SliverAppBar(
-            title: Text("SliverSubAppbar"),
-            pinned: true,
-          ),
-          SliverPersistentHeader(
-            delegate: MyPersistentHeaderDelegate(
-              minHeight: 60.0,
-              maxHeight: 200.0,
-            ),
-            pinned: true,
-          ),
-          SliverToBoxAdapter(
-            child: Container(
-              height: 200,
-              color: Colors.red,
-            ),
-          ),
-          buildSliverFillViewport(),
-          SliverGrid.builder(
-            itemCount: 6,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3, mainAxisSpacing: 10, crossAxisSpacing: 10),
-            itemBuilder: (context, index) {
-              return Container(
-                color: Colors.grey,
-                child: Text("$index"),
-              );
-            },
-          ),
-          SliverFixedExtentList(
-            itemExtent: 100,
-            delegate: SliverChildBuilderDelegate(
-              childCount: 50,
-                  (context, index) {
-                if (index % 4 == 0 && index != 0) {
-                  return Ad((index / 4).toInt());
-                } else {
-                  return Diary(index);
-                }
+            leading: Icon(Icons.menu),
+            title: Text("Around"),
+            expandedHeight: screenHeight,
+            flexibleSpace: PageView.builder(
+              itemCount: 5,
+              itemBuilder: (context, index) {
+                return Image.network(
+                  "https://picsum.photos/id/${index + 1}/200/300",
+                  fit: BoxFit.cover,
+                );
               },
             ),
           ),
         ],
       ),
     );
-  }
-
-  SliverFillViewport buildSliverFillViewport() {
-    return SliverFillViewport(
-      delegate: SliverChildBuilderDelegate(
-        childCount: 2,
-            (context, index) {
-          return Container(
-            height: 50,
-            alignment: Alignment.center,
-            color: Colors.lightBlue[100 * (index % 9)],
-            child: Text("List Item $index"),
-          );
-        },
-      ),
-    );
-  }
-}
-
-
-class MyPersistentHeaderDelegate extends SliverPersistentHeaderDelegate {
-  final double minHeight;
-  final double maxHeight;
-
-  MyPersistentHeaderDelegate({
-    required this.minHeight,
-    required this.maxHeight,
-  });
-
-  @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(
-      color: Colors.blueGrey,
-      child: Center(
-        child: Text(
-          'SliverPersistentHeader',
-          style: TextStyle(fontSize: 20.0, color: Colors.white),
-        ),
-      ),
-    );
-  }
-
-  @override
-  double get maxExtent => maxHeight;
-
-  @override
-  double get minExtent => minHeight;
-
-  @override
-  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) {
-    return true;
   }
 }
